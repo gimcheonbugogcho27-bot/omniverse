@@ -1,0 +1,23 @@
+# OMNIVERSE X ALPHA 1.0 — Render 설정 (저장소의 ZIP을 빌드 때 풀어서 실행)
+services:
+  - type: web
+    name: omniverse
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: python3 -m zipfile -e omniverse-x-alpha1.zip . && pip install -r omniverse-x/requirements.txt
+    startCommand: cd omniverse-x && python migrate.py && gunicorn app:app --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: ADMIN_EMAILS
+        sync: false
