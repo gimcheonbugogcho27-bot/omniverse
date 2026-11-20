@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 108dp 적응형 아이콘: 보라·시안 행성 + 궤도 고리 + X -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:pathData="M54,54m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="46" android:centerY="44" android:gradientRadius="30">
+                <item android:offset="0" android:color="#FFE0FBFF" />
+                <item android:offset="0.35" android:color="#FF22D3EE" />
+                <item android:offset="0.75" android:color="#FF7C5CFF" />
+                <item android:offset="1" android:color="#FF1A0B4A" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M54,54m-36,0a36,11 0,1 1,72 0a36,11 0,1 1,-72 0"
+        android:strokeColor="#FF22D3EE" android:strokeWidth="3" android:fillColor="#00000000" />
+    <path android:pathData="M45,45 L63,63 M63,45 L45,63"
+        android:strokeColor="#FFFFFFFF" android:strokeWidth="5" android:strokeLineCap="round" />
+</vector>

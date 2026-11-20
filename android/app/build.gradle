@@ -1,0 +1,45 @@
+plugins {
+    id "com.android.application"
+}
+
+// GitHub Actions 실행 번호를 버전 코드로 사용 → 새 APK가 기존 앱 위에 업데이트로 설치됨
+def ciBuild = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
+
+android {
+    namespace "com.omniverse.x"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.omniverse.x"
+        minSdk 26
+        targetSdk 34
+        versionCode ciBuild
+        versionName "1.0.${ciBuild}"
+        buildConfigField "String", "SITE_URL", "\"https://omniverse-md8z.onrender.com/\""
+    }
+
+    signingConfigs {
+        release {
+            // 환경변수(GitHub Secrets)로 다른 키를 지정할 수 있고, 없으면 저장소의 키를 사용
+            storeFile file(System.getenv("OMNI_KEYSTORE") ?: "../keystore/omniverse-release.p12")
+            storePassword System.getenv("OMNI_KEYSTORE_PASSWORD") ?: "omniverse-x-2026"
+            keyAlias System.getenv("OMNI_KEY_ALIAS") ?: "omniverse"
+            keyPassword System.getenv("OMNI_KEY_PASSWORD") ?: "omniverse-x-2026"
+            storeType "pkcs12"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    buildFeatures { buildConfig true }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

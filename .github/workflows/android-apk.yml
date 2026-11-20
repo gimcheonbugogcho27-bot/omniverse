@@ -1,0 +1,84 @@
+name: Android APK 빌드
+
+# android 폴더가 바뀌면 자동 빌드, Actions 탭에서 수동 실행도 가능
+on:
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - ".github/workflows/android-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      # (선택) 저장소 Settings → Secrets에 ANDROID_KEYSTORE_BASE64 등을 넣으면 그 키로 서명
+      - name: 서명 키 준비
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.p12"
+            echo "OMNI_KEYSTORE=$RUNNER_TEMP/release.p12" >> "$GITHUB_ENV"
+            echo "OMNI_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "OMNI_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
+            echo "OMNI_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+            echo "Secrets의 서명 키 사용"
+          else
+            echo "저장소의 기본 서명 키 사용 (android/keystore)"
+          fi
+
+      - name: APK 빌드
+        working-directory: android
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: APK 이름 정리
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/app-release.apk dist/omniverse-x.apk
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: omniverse-x-apk
+          path: dist/omniverse-x.apk
+
+      # 빌드마다 새 릴리스를 만들고 '최신(latest)'으로 지정 → 고정 링크는 항상 최신 APK
+      - name: GitHub 릴리스에 올리기
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-v1.0.${{ github.run_number }}
+          name: OMNIVERSE X 안드로이드 v1.0.${{ github.run_number }}
+          make_latest: true
+          files: dist/omniverse-x.apk
+          body: |
+            OMNIVERSE X 안드로이드 앱 (v1.0.${{ github.run_number }})
+
+            항상 최신 버전 다운로드:
+            https://github.com/${{ github.repository }}/releases/latest/download/omniverse-x.apk
+
+            설치: 휴대폰에서 위 링크를 열어 내려받고, '출처를 알 수 없는 앱 설치'를 허용한 뒤 설치하세요.

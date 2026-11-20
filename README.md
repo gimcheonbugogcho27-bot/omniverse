@@ -24,3 +24,13 @@ AI + 3D 행성 월드 + 게임 + 소셜 + 가상 경제 + 창작 도구를 하�
 | `ADMIN_EMAILS` | 관리자로 쓸 이메일 (먼저 그 이메일로 가입한 뒤 설정 권장) |
 
 데이터베이스는 Supabase(서울)에 이미 만들어져 있고, 시작할 때 `migrate.py`가 빠진 마이그레이션만 적용합니다.
+
+## 📱 안드로이드 앱 (APK)
+
+**항상 최신 버전 다운로드 (고정 링크):**
+https://github.com/gimcheonbugogcho27-bot/omniverse/releases/latest/download/omniverse-x.apk
+
+- `android/` 폴더의 앱이 OMNIVERSE X 사이트를 앱 화면으로 띄웁니다. 로그인은 앱 안에 유지됩니다.
+- `android/` 폴더를 바꿔 main에 올리거나, GitHub → Actions → **Android APK 빌드** → Run workflow를 누르면 새 APK가 만들어집니다.
+- 빌드마다 버전 번호가 올라가서 기존 앱 위에 업데이트로 설치됩니다.
+- 서명 키는 `android/keystore/`에 있습니다. 저장소가 공개라 누구나 이 키를 볼 수 있으니, 앱을 널리 배포할 때는 새 키를 만들어 저장소 Settings → Secrets에 `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`로 넣으세요(넣으면 그 키가 우선 사용됩니다).
